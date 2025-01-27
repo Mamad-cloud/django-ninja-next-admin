@@ -1,4 +1,4 @@
-import { Item } from "@/utils/types";
+import { Item } from "@/lib/types";
 
 export default function ItemEl({
     id,

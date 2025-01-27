@@ -1,22 +1,71 @@
+'use server'
 
+import { Item, Module } from "@/lib/definitions"
+import { DJANGO_API_ENDPOINT } from "@/config/defaults"
+import { FormState, SignupFormSchema,  LoginFormSchema} from "@/lib/definitions"
+import ApiProxy from "@/app/api/api_proxy"
 
-export async function login(form_data: FormData) {
-    const userName = form_data.get("username")
-    const password = form_data.get("password")
+const LOGIN_URL = "/api/login/"
 
-    const response = await fetch(`${process.env.API_URL}/token/pair`, {
-        method: "post",
-        headers: { "Content-Type": "application/json"},
-        body: JSON.stringify({ userName, password})
+// const bcrypt = require('bcrypt') 
+
+// TODO: handle the login the same as the signup maybe
+export async function signup(form_state: FormState, form_data: FormData) : Promise<any> {
+
+    // Validate form fields
+    const validatedFields = SignupFormSchema.safeParse({
+        username: form_data.get('username'),
+        email: form_data.get('email'),
+        password: form_data.get('password'),
     })
 
-    if ( !response.ok) {
-        throw new Error( "Failed Authentication" )
+    // If any form fields are invalid, return early
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+        }
     }
 
-    const data = await response.json()
-    sessionStorage.setItem("access", data.access)
-    sessionStorage.setItem("refresh", data.refresh)
+    // Prepare data for insertion into database
+    const { username, email, password } = validatedFields.data
+    
+    // e.g. Hash the user's password before storing it
+    //TODO: Double hashing the password (once here and once on the backend)
+    //const hashedPassword = await bcrypt.hash(password, 10)
+    
 
-    return data
+    // Call the provider or db to create a user...
+    const response = await fetch(`${DJANGO_API_ENDPOINT}/register`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password, email }),
+    })
+    // TODO: handle Erros better ( in sync with backend )
+    const data = await response.json()
+    if (data.error) {
+        return {
+            message: data.error
+        }
+    }
+
+}
+
+
+export async function fetchItems(): Promise<Item[]> {
+    const response = await fetch(`${DJANGO_API_ENDPOINT}/items`)
+    if ( !response.ok) {
+        throw new Error("failed to fetch items!")
+    }
+
+    return response.json()
+}
+
+export async function fetchModules(): Promise<Module[]> {
+    const response = await ApiProxy.get(`${DJANGO_API_ENDPOINT}/teams/modules`, false)
+    if ( response.status === 200 ) {
+        return response.data as Module[]
+    } 
+    return []
 }

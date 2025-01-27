@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'ninja_extra',
     'ninja_jwt',
     'api',
+    'teams',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +64,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "https://localhost:3000",
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Allow requests from Next.js development server
