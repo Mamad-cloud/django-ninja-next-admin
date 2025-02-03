@@ -13,7 +13,7 @@ export default class ApiProxy {
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        const authToken = getToken()
+        const authToken = await getToken()
         if (authToken && requireAuth === true) {
             headers["Authorization"] = `Bearer ${authToken}`
         }

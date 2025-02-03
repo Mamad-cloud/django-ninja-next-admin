@@ -17,7 +17,7 @@ class Invoice(models.Model):
     def __str__(self):
         return self.name
 
-class DasboardSettings(models.Model):
+class DasboardSetting(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     background_primary = models.IntegerField()
     foreground_primary = models.IntegerField()

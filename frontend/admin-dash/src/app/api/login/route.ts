@@ -1,6 +1,6 @@
 "use server"
 import { DJANGO_API_ENDPOINT } from "@/config/defaults"
-
+import { cookies } from "next/headers"
 import { setRefreshToken, setToken } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -25,8 +25,9 @@ export async function POST(request: Request) {
 
         console.log("logged in")
         const {username, access, refresh} = responseData
-        setToken(access)
-        setRefreshToken(refresh)
+        await setToken(access)
+        await setRefreshToken(refresh)
+
         return NextResponse.json({"loggedIn": true, "username": username}, {status: 200})
     }
 

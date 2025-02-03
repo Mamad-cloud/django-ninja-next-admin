@@ -9,7 +9,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/components/auth-provider"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 
 const LOGIN_URL = "/api/login/"
 
@@ -18,19 +19,31 @@ export function LoginForm({
     ...props
 }: React.ComponentProps<"div">) {
     const auth = useAuth()
-    
+
     const [error, setError] = useState("")
     const [pending, setPending] = useState(false)
 
     const [inputUsername, setInputUsername] = useState("")
     const [inputPassword, setInputPassword] = useState("")
 
+    const search_params = useSearchParams()
+    
+
+    useEffect(() => {
+        
+        const un_search_param = search_params.get('username')
+        if ( un_search_param !== null) {
+            setInputUsername(un_search_param) 
+        }
+
+    }, [])
 
     async function handleSubmit(event: any): Promise<any> {
         event.preventDefault()
         
+        
         const jsonData = JSON.stringify({ username: inputUsername, password: inputPassword})
-        console.log(jsonData)
+        //console.log(jsonData)
         const response = await fetch(LOGIN_URL, {
             method: "POST",
             headers: {
@@ -64,7 +77,7 @@ export function LoginForm({
                                 <p className="text-balance text-muted-foreground">
                                     Login to your Black Rose account
                                 </p>
-                                <p>er{error}</p>
+
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="username">Username</Label>
@@ -74,8 +87,8 @@ export function LoginForm({
                                     placeholder="Username"
                                     required
                                     disabled={pending}
-                                    value={inputUsername}
-                                    onChange={( e) => setInputUsername( e.target.value )}
+                                    value={ inputUsername}
+                                    onChange={( e) => { setInputUsername( e.target.value ) }}
                                 />
                             </div>
                             <div className="grid gap-2">
@@ -83,7 +96,7 @@ export function LoginForm({
                                     <Label htmlFor="password">Password</Label>
                                     <a
                                         href="#"
-                                        className="ml-auto text-sm underline-offset-2 hover:underline"
+                                        className="ml-auto text-muted-foreground text-sm underline-offset-2 hover:underline hover:text-foreground"
                                     >
                                         Forgot your password?
                                     </a>
@@ -97,6 +110,8 @@ export function LoginForm({
                                     onChange={( e) => setInputPassword( e.target.value )}
                                 />
                             </div>
+
+                            <p>{error}</p>
                             <Button type="submit" className="w-full" disabled={pending}>
                                 Login
                             </Button>
@@ -135,9 +150,9 @@ export function LoginForm({
                                     <span className="sr-only">Login with Meta</span>
                                 </Button>
                             </div>
-                            <div className="text-center text-sm">
+                            <div className="text-center text-sm text-muted-foreground">
                                 Don&apos;t have an account?{" "}
-                                <Link href="/signup" className="underline underline-offset-4">
+                                <Link href="/signup" className="underline underline-offset-4 text-muted-foreground hover:text-foreground">
                                     Sign up
                                 </Link>
                             </div>
@@ -145,9 +160,9 @@ export function LoginForm({
                     </form>
                     <div className="relative hidden bg-muted md:block">
                         <img
-                            src="/globe.svg"
+                            src="/adrian-regeci-LR5-H-gLAhE-unsplash.jpg"
                             alt="Login"
-                            className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                            className="absolute inset-0 h-full w-full object-cover"
                         />
                     </div>
                 </CardContent>

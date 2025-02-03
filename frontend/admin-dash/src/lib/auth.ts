@@ -1,4 +1,4 @@
-
+'use server'
 import { cookies } from "next/headers"
 
 // TODO: sync the token age with backend 
@@ -7,6 +7,7 @@ const TOKEN_NAME = "access"
 const TOKEN_REFRESH_NAME = "refresh"
 
 export async function getToken(){
+
     // api requests
     const _cookies = await cookies()
     const myAuthToken = _cookies.get(TOKEN_NAME)
@@ -29,6 +30,7 @@ export async function setToken(authToken: string){
         sameSite: 'strict',
         secure: process.env.NODE_ENV !== 'development',
         maxAge: TOKEN_AGE,
+        path: '/',
     })
 
 }
@@ -41,6 +43,7 @@ export async function setRefreshToken(authRefreshToken: string){
         sameSite: 'strict',
         secure: process.env.NODE_ENV !== 'development',
         maxAge: TOKEN_AGE,
+        path: '/',
     })
 }
 

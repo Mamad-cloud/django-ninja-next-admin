@@ -3,7 +3,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { createContext, useContext, useState, useEffect } from "react"
-
+//TODO: setActiveTeam from here
 // Define the type for the authentication context values
 type AuthContextVals = {
     isAuthenticated: boolean,
@@ -102,11 +102,11 @@ export function AuthProvider({ children }: {children: React.ReactNode}) {
         localStorage.setItem(LOCAL_STORAGE_KEY, "0")
 
          // Generate a URL for the login page with the current pathname as "next"
-        let loginWithNextUrl = `${LOGIN_REQUIRED_URL}?next=${pathname}`
-        if (LOGIN_REQUIRED_URL === pathname) {
-            loginWithNextUrl = `${LOGIN_REQUIRED_URL}`
-        }
-        router.replace(loginWithNextUrl)
+        // let loginWithNextUrl = `${LOGIN_REQUIRED_URL}?next=${pathname}`
+        // if (LOGIN_REQUIRED_URL === pathname) {
+        //     loginWithNextUrl = `${LOGIN_REQUIRED_URL}`
+        // }
+        router.replace("/login")
     }
 
     // Provide the authentication context to child components

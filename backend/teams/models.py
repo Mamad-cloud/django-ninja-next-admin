@@ -8,14 +8,14 @@ class Team(models.Model):
     leader = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f"{self.name} - {self.leader.username if self.leader else 'No Leader'}"
+        return f"{self.name}"
 
-class TeamMembers(models.Model):
-    team_Id = models.ForeignKey(Team, on_delete=models.CASCADE)
-    member_id = models.ForeignKey(User, on_delete=models.CASCADE)
+class TeamMember(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    member = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"{self.team_Id.name} - {self.member_id.username}"
+        return f"{self.member.username}"
 
 class Module(models.Model):
     name = models.CharField(max_length=100)
@@ -23,11 +23,18 @@ class Module(models.Model):
     def __str__(self):
         return self.name
 
-class TeamMemberModules(models.Model):
-    team_Id = models.ForeignKey(Team, on_delete=models.CASCADE)
-    member_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    module_id = models.ForeignKey(Module, on_delete=models.CASCADE)
+class TeamMemberModule(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    member = models.ForeignKey(User, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE)
 
     def __str__(self):
-         return f"{self.team_Id.name}: {self.member_id.username} > {self.module_id.name}"
+         return f"{self.team.name}"
 
+
+class Product(models.Model):
+    name = models.CharField(max_length=200)
+    price = models.BigIntegerField()
+    quantity = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
