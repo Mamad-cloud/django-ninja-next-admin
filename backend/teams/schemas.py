@@ -1,6 +1,11 @@
 from ninja import ModelSchema, Schema
 from .models import Module, Team, Product
 
+class Error(Schema):
+    message: str
+class Message(Schema):
+    message: str
+
 class ModuleSchema(ModelSchema):
     class Config:
         model = Module

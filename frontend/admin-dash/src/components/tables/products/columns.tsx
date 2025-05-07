@@ -1,4 +1,5 @@
 "use client"
+
 import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,7 @@ import {
 import { Product } from "@/lib/definitions"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -41,6 +43,22 @@ export const columns: ColumnDef<Product>[] = [
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>View Team</DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                fetch( `/api/products?q=${product.name}`, 
+                                    {
+                                        method: "DELETE",
+                                    }
+                                ).then( res => {
+                                    toast.success(`${product.name} was deleted`)
+                                    console.log(res)
+                                }).catch( err => {
+                                    toast.error(`couldn't delete ${product.name}`)
+                                })
+                            }}
+                        >
+                            Delete
+                        </DropdownMenuItem>
                         <DropdownMenuItem>View product details</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

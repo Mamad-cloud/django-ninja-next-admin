@@ -27,14 +27,43 @@ export function TeamSwitcher({
   teams: Team[]
 }) {
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = useState(teams[0])
-  
-  const teamContext = useTeam()
+  const [activeTeam, setActiveTeam] = useState<Team | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  const teamContext = useTeam();
 
   useEffect(() => {
-    teamContext.setActiveTeam(activeTeam.id, activeTeam.name as string)
-  },[])
+    setIsMounted(true);
+  }, []);
 
+  useEffect(() => {
+    if (isMounted) {
+      // Load the active team from local storage if available
+      const savedTeam = localStorage.getItem("activeTeam");
+      if (savedTeam) {
+        setActiveTeam(JSON.parse(savedTeam));
+      } else {
+        setActiveTeam(teams[0]);
+      }
+    }
+  }, [isMounted, teams]);
+
+  useEffect(() => {
+    if (activeTeam) {
+      // Set the active team in the context
+      teamContext.setActiveTeam(activeTeam.id, activeTeam.name as string);
+      // Save the active team to local storage
+      localStorage.setItem("activeTeam", JSON.stringify(activeTeam));
+    }
+  }, [activeTeam, teamContext]);
+
+  const handleTeamChange = (team: Team) => {
+    setActiveTeam(team);
+  };
+
+  if (!activeTeam) {
+    return null //or a loading spinner
+  }
 
   return (
     <SidebarMenu>
@@ -47,7 +76,7 @@ export function TeamSwitcher({
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 {/* <activeTeam.logo className="size-4" /> */}
-                <Flower  className="size-4"/>
+                <Flower className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
@@ -71,15 +100,14 @@ export function TeamSwitcher({
               <DropdownMenuItem
                 key={team.name}
                 onClick={() => {
-                  teamContext.setActiveTeam(team.id, team.name as string)
-                  setActiveTeam(team)
+                  handleTeamChange(team)
                 }}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   {/* <team.logo className="size-4 shrink-0" /> */}
-                <Flower  className="size-4 shrink-0"/>
-                  
+                  <Flower className="size-4 shrink-0" />
+
                 </div>
                 {team.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>

@@ -58,7 +58,7 @@ export async function signup(form_state: FormState, form_data: FormData) : Promi
     redirect(`/login?username=${data.username}`)
 
 }
-
+// TODO: change the requiredAuth to false see if there is no problem because this endpoint is unprotected
 export async function fetchModules(): Promise<ModuleBase[]> {
     const response = await ApiProxy.get(`${DJANGO_API_ENDPOINT}/teams/modules`, true)
     if ( response.status === 200 ) {

@@ -1,0 +1,1 @@
+# A proof of concept modular admin dashboard with teams, Inspired by Odoo  

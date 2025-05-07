@@ -18,11 +18,36 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+
 import { SidebarData } from "@/lib/definitions"
 import { ModeToggle } from "./ui/mode-toggle"
-
+import { usePathname } from "next/navigation"
+import React from "react"
 
 export default function Dashboard({children, sidebarData}: {children: React.ReactNode, sidebarData: SidebarData}) {
+  
+  const pathname = usePathname()
+  const breadCrumbs = pathname.split('/').slice(1).map(( path, idx, arr) => {
+    if ( idx === arr.length - 1) {
+      return (
+        <BreadcrumbItem key={idx} className="hidden md:block">
+          <BreadcrumbPage>{path[0].toUpperCase() + path.substring(1)}</BreadcrumbPage>
+        </BreadcrumbItem>
+      )
+    } else {
+      return (
+        <React.Fragment key={idx}>
+          <BreadcrumbLink  href={`/${arr.slice(0, idx + 1).join('/')}`}>
+            {path[0].toUpperCase() + path.substring(1)}
+          </BreadcrumbLink>
+            <BreadcrumbSeparator className="hidden md:block" />
+          </React.Fragment>
+      )
+    }
+
+  })
+
+  
   return (
     <SidebarProvider>
       <AppSidebar data={sidebarData}/>
@@ -33,15 +58,7 @@ export default function Dashboard({children, sidebarData}: {children: React.Reac
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard">
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                {breadCrumbs}
               </BreadcrumbList>
             </Breadcrumb>
           </div>

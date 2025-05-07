@@ -6,7 +6,7 @@ export default function SelectedModule( {name, onDelete} : {name: string, onDele
             <div className="flex justify-center items-center p-1  bg-muted rounded-full">
                 <X width={20} height={20} />
             </div>
-            <p className="text-muted-foreground">{name}</p>
+            <p className="text-muted-foreground select-none">{name}</p>
         </div>
     )
 }

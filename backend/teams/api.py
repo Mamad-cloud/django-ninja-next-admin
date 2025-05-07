@@ -1,7 +1,7 @@
 from typing import List
 
 from ninja import Router
-from .schemas import ModuleSchema, TeamSchema, ProductSchema, ProductGetSchema, ProductCreateSchema
+from .schemas import ModuleSchema, TeamSchema, ProductSchema, ProductGetSchema, ProductCreateSchema, Error, Message
 from .models import Module, Team, TeamMemberModule, TeamMember, Product
 
 import helpers
@@ -38,13 +38,24 @@ def get_user_modules(request):
 
     return modules
 
-# @router.get('/{team}/products', auth=helpers.api_auth_user_required, response=List[ProductSchema])
-# def get_all_team_products(request, team: str):
-#     _team = Team.objects.get(name=team)
-#     if (TeamMember.objects.get(team=_team, member=request.user) | _team.leader == request.user):
-#         return Product.objects.filter(team=team)
-#     else: 
-#         return []
+@router.get('/{team_id}/products', auth=helpers.api_auth_user_required, response=List[ProductGetSchema])
+def get_all_team_products(request, team_id: int):
+    team = Team.objects.get(pk=team_id)
+    if (TeamMember.objects.filter(team=team, member=request.user).exists() or team.leader == request.user):
+        db_products = Product.objects.filter(team=team)
+        products: List[ProductGetSchema] = []
+    
+        for prod in db_products:
+            products.append({
+                'name': prod.name,
+                'price': prod.price,
+                'quantity': prod.quantity,
+                'username': prod.user.username,
+                'team': prod.team.name
+            })
+        return products
+    else: 
+        return []
 
 
 @router.get('/products', auth=helpers.api_auth_user_required, response=List[ProductGetSchema])
@@ -66,11 +77,24 @@ def get_all_products(request):
 @router.post('/products', auth=helpers.api_auth_user_required, response=ProductSchema)
 def create_products(request, product: ProductCreateSchema):
     team = Team.objects.get(name=product.team)
-    
-    return Product.objects.create( 
-        name=product.name, 
-        price=product.price, 
-        quantity=product.quantity, 
-        user=request.user,
-        team=team
-    )
+    if (TeamMember.objects.filter( team=team, member=request.user ).exists() or team.leader == request.user): 
+
+        return Product.objects.create( 
+            name=product.name, 
+            price=product.price, 
+            quantity=product.quantity, 
+            user=request.user,
+            team=team
+        )
+
+
+
+
+@router.delete('/products/{name}', auth=helpers.api_auth_user_required, response={200: Message, 401: Error})
+def delete_product(request, name: str):
+    product = Product.objects.get(name=name)
+    if (product and  product.user == request.user):
+        product.delete()
+        return 200, { 'message': 'product deleted'}
+    else: 
+        return 401, { 'message': 'you can only delete your own products'}

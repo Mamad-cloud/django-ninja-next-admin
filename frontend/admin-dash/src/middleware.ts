@@ -7,7 +7,7 @@ import { DJANGO_API_ENDPOINT } from './config/defaults'
 import ApiProxy from '@/app/api/api_proxy'
 
 export const config = {
-    matcher: ["/dashboard", "/login"]
+    matcher: ["/dashboard/:path*", "/login"]
 }
 
 async function verifyToken(token: string) {
@@ -42,6 +42,7 @@ export async function middleware(request: NextRequest) {
     // TODO: Redirect to dashboard from home page 
     
     if (request.nextUrl.pathname.startsWith('/dashboard')) {
+        console.log(request.nextUrl.pathname)
         // console.log(request.cookies.get("access")) 
         const token = await getToken()
         const refresh = await getRefreshToken()
